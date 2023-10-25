@@ -1,4 +1,4 @@
-package server
+package main
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"server/src/domain/model"
 	external_api "server/src/infrastrutcture/external-api"
 )
 
@@ -23,21 +24,25 @@ func main() {
 	// var initial_items_id = 501
 	// var end_items_id = 60053
 
-    ch := make(chan string)
-
+	fmt.Printf("init downloading files\n")
 	for id := initial_monsters_id; id <= end_monsters_id; id++ {
 		url, err := base_url.CreateMonsterUrlRequest(strconv.Itoa(id))
 
 		if err != nil || url == "" {
-			log.Fatal("Cannot GET the monster_{id}")
+            log.Fatal("Cannot GET the monster_id: ", id)
             time.Sleep(300 * time.Millisecond)
 			continue
 		}
 
-        external_api.Fetch(url, ch)
+        monster, err := external_api.Fetch[model.Monster](url)
 
-        time.Sleep(300 * time.Millisecond)
+        if err != nil {
+            log.Fatal("Problem fetching monster_id: ", id)
+        }
+
+        fmt.Println(monster)
+
+        time.Sleep(3 * time.Millisecond)
 	}
 
-	fmt.Printf("init downloading files")
 }

@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  backend:
+    image: goland:1.20
+    ports:
+      - 5555:5555
+    volumes: 
+      - ./server:/go/src
+
+  database:
+    image: nouchka/sqlite3:latest
+    volumes:
+      - ./database/:/database/
+    ports:
+      - 7777:7777

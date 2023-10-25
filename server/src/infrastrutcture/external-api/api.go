@@ -1,9 +1,11 @@
 package external_api
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
+	"server/src/domain/model"
 )
 
 type ExternalApiUrl struct {
@@ -62,15 +64,24 @@ func NewApiUrl(base string, monsters string, items string) (*ExternalApiUrl, err
 	return &base_url, nil
 }
 
-func Fetch(url string, ch chan <- string) {
+func Fetch[K model.Monster | model.Item](url string) (*K, error) {
     resp, err := http.Get(url)
 
     if err != nil {
-        ch <- fmt.Sprint(err)
-        return
+        return nil, err
     }
 
     defer resp.Body.Close()
 
-    ch <- fmt.Sprintf("Fetched %s - Status Code: %d", url, resp.StatusCode)
+    fmt.Printf("Fetched %s - Status Code: %d\n", url, resp.StatusCode)
+
+    var target K
+
+    err = json.NewDecoder(resp.Body).Decode(&target)
+
+    if err != nil {
+        return nil, err
+    }
+
+    return &target, nil
 }

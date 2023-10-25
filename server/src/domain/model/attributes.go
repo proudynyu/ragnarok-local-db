@@ -1,10 +1,10 @@
 package model
 
 type Attribute struct {
-    agi int16
-    int int16
-    luk int16
-    vit int16
-    dex int16
+    Agi int16
+    Int int16
+    Luk int16
+    Vit int16
+    Dex int16
 }
 
