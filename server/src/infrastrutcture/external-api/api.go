@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"server/src/domain/model"
 )
@@ -64,24 +65,46 @@ func NewApiUrl(base string, monsters string, items string) (*ExternalApiUrl, err
 	return &base_url, nil
 }
 
-func Fetch[K model.Monster | model.Item](url string) (*K, error) {
+func JsonParse[K model.Monster | model.Item](body []byte) (string, error) {
+    var target K
+
+    err := json.Unmarshal(body, &target)
+
+    if err != nil {
+        return "", err
+    }
+
+    formatted, err := json.MarshalIndent(target, "", " ")
+    
+    if err != nil {
+        return "", err
+    }
+
+    return string(formatted), nil
+}
+
+func Fetch[K model.Monster | model.Item](url string) (string, error) {
     resp, err := http.Get(url)
 
     if err != nil {
-        return nil, err
+        return "", err
     }
 
     defer resp.Body.Close()
 
     fmt.Printf("Fetched %s - Status Code: %d\n", url, resp.StatusCode)
 
-    var target K
-
-    err = json.NewDecoder(resp.Body).Decode(&target)
+    body, err := io.ReadAll(resp.Body)
 
     if err != nil {
-        return nil, err
+        return "", err
     }
 
-    return &target, nil
+    formatted, err := JsonParse[K](body)
+
+    if err != nil {
+        return "", err
+    }
+
+    return formatted, nil
 }

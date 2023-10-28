@@ -6,9 +6,11 @@ type Monster struct  {
     Size string `json:"size"`
     Race string `json:"race"`
     Element_type string `json:"type"`
+    Name string `json:"monster_info"`
     // Items []*Item
 }
 
 func (m *Monster) New(monster_id string, size string, race string, element_type string) error {
     return nil
 }
+

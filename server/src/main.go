@@ -36,7 +36,7 @@ func main() {
 
         monster, err := external_api.Fetch[model.Monster](url)
 
-        if err != nil {
+        if err != nil && monster == "" {
             log.Fatal("Problem fetching monster_id: ", id)
         }
 
