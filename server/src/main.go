@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
-	"strconv"
+	"sync"
 	"time"
 
 	"server/src/domain/model"
@@ -17,32 +17,38 @@ func main() {
 		log.Fatal("Not possible to create the base url")
 	}
 
-	var initial_monsters_id = 1001
-	var end_monsters_id = 1002
-	// var end_monsters_id = 3896
+    maxConcurrentRequest := 2
 
-	// var initial_items_id = 501
-	// var end_items_id = 60053
+    urlChan := make(chan string)
+    resultCh := make(chan string)
 
 	fmt.Printf("init downloading files\n")
-	for id := initial_monsters_id; id <= end_monsters_id; id++ {
-		url, err := base_url.CreateMonsterUrlRequest(strconv.Itoa(id))
+    urls, err := base_url.CreateMonsterUrlRequest()
 
-		if err != nil || url == "" {
-            log.Fatal("Cannot GET the monster_id: ", id)
-            time.Sleep(300 * time.Millisecond)
-			continue
-		}
+    if err != nil {
+        log.Fatal(err)
+    }
 
-        monster, err := external_api.Fetch[model.Monster](url)
+    for _, url := range *urls {
+        urlChan<-url
+    }
 
-        if err != nil && monster == "" {
-            log.Fatal("Problem fetching monster_id: ", id)
-        }
+    close(urlChan)
 
-        fmt.Println(monster)
+    var wg sync.WaitGroup
 
+    for concurrency := 0; concurrency <= maxConcurrentRequest; concurrency++ {
+        wg.Add(1)
+        go external_api.Worker[model.Monster](urlChan, resultCh, &wg)
         time.Sleep(3 * time.Millisecond)
-	}
+    }
 
+    go func() {
+        wg.Wait()
+        close(resultCh)
+    }()
+
+    for msg := range resultCh {
+        fmt.Println(msg)
+    }
 }

@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"server/src/domain/model"
+	"sync"
 )
 
 type ExternalApiUrl struct {
@@ -15,32 +16,40 @@ type ExternalApiUrl struct {
 	items    string
 }
 
-func (a *ExternalApiUrl) CreateMonsterUrlRequest(monster_id string) (string, error) {
-	if monster_id == "" {
-		return "", errors.New("No Monster ID was passed")
-	}
+func (a *ExternalApiUrl) CreateMonsterUrlRequest() (*[]string, error) {
+	var initial_monsters_id = 1001
+	var end_monsters_id = 1002
+	// var end_monsters_id = 3896
 
-	url := a.base + a.monsters + monster_id
+    var urls = []string {}
 
-	if url == monster_id {
-		return "", errors.New("No Monster ID was passed")
-	}
+    for id := initial_monsters_id; id <= end_monsters_id; id++ {
+        url := a.base + a.monsters + fmt.Sprint(id)
+        urls = append(urls, url)
+    }
 
-	return url, nil
+    if len(urls) <= 0 {
+		return nil, errors.New("No Monster ID was passed")
+    }
+
+	return &urls, nil
 }
 
-func (a *ExternalApiUrl) CreateItemUrlRequest(item_id string) (string, error) {
-	if item_id == "" {
-		return "", errors.New("No Monster ID was passed")
-	}
+func (a *ExternalApiUrl) CreateItemUrlRequest(item_id string) (*[]string, error) {
+	var initial_items_id = 501
+	var end_items_id = 60053
+    var urls = []string {}
 
-	url := a.base + a.monsters + item_id
+    for id := initial_items_id; id <= end_items_id; id++ {
+        url := a.base + a.monsters + fmt.Sprint(id)
+        urls = append(urls, url)
+    }
 
-	if url == item_id {
-		return "", errors.New("No Monster ID was passed")
-	}
+    if len(urls) <= 0 {
+		return nil, errors.New("No Monster ID was passed")
+    }
 
-	return url, nil
+	return &urls, nil
 }
 
 func NewApiUrl(base string, monsters string, items string) (*ExternalApiUrl, error) {
@@ -83,11 +92,14 @@ func JsonParse[K model.Monster | model.Item](body []byte) (string, error) {
     return string(formatted), nil
 }
 
-func Fetch[K model.Monster | model.Item](url string) (string, error) {
+func Fetch[K model.Monster | model.Item](url string, ch chan<- string, wg *sync.WaitGroup) {
+    defer wg.Done()
+
     resp, err := http.Get(url)
 
     if err != nil {
-        return "", err
+        ch <- fmt.Sprintf("Error fetching %s: %v", url, err)
+        return
     }
 
     defer resp.Body.Close()
@@ -97,14 +109,24 @@ func Fetch[K model.Monster | model.Item](url string) (string, error) {
     body, err := io.ReadAll(resp.Body)
 
     if err != nil {
-        return "", err
+        ch <- fmt.Sprintf("Error reading body from %s: %v", url, err)
+        return
     }
 
     formatted, err := JsonParse[K](body)
 
     if err != nil {
-        return "", err
+        ch <- fmt.Sprintf("Error parsing json %s: %v", url, err)
+        return
     }
 
-    return formatted, nil
+    ch <- formatted
+}
+
+func Worker[K model.Monster | model.Item](urlCh <-chan string, resultCh chan<- string, wg *sync.WaitGroup) {
+    defer wg.Done()
+
+    for url := range urlCh {
+        Fetch[K](url, resultCh, wg)
+    }
 }
