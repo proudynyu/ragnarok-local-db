@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"server/src/domain/model"
-	"sync"
 )
 
 type ExternalApiUrl struct {
@@ -92,14 +91,11 @@ func JsonParse[K model.Monster | model.Item](body []byte) (string, error) {
     return string(formatted), nil
 }
 
-func Fetch[K model.Monster | model.Item](url string, ch chan<- string, wg *sync.WaitGroup) {
-    defer wg.Done()
-
+func Fetch[K model.Monster | model.Item](url string) (string, error) {
     resp, err := http.Get(url)
 
     if err != nil {
-        ch <- fmt.Sprintf("Error fetching %s: %v", url, err)
-        return
+        return "", err
     }
 
     defer resp.Body.Close()
@@ -109,24 +105,14 @@ func Fetch[K model.Monster | model.Item](url string, ch chan<- string, wg *sync.
     body, err := io.ReadAll(resp.Body)
 
     if err != nil {
-        ch <- fmt.Sprintf("Error reading body from %s: %v", url, err)
-        return
+        return "", err
     }
 
     formatted, err := JsonParse[K](body)
 
     if err != nil {
-        ch <- fmt.Sprintf("Error parsing json %s: %v", url, err)
-        return
+        return "", err
     }
 
-    ch <- formatted
-}
-
-func Worker[K model.Monster | model.Item](urlCh <-chan string, resultCh chan<- string, wg *sync.WaitGroup) {
-    defer wg.Done()
-
-    for url := range urlCh {
-        Fetch[K](url, resultCh, wg)
-    }
+    return formatted, nil
 }

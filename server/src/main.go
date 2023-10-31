@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"sync"
 	"time"
 
 	"server/src/domain/model"
@@ -17,11 +16,6 @@ func main() {
 		log.Fatal("Not possible to create the base url")
 	}
 
-    maxConcurrentRequest := 2
-
-    urlChan := make(chan string)
-    resultCh := make(chan string)
-
 	fmt.Printf("init downloading files\n")
     urls, err := base_url.CreateMonsterUrlRequest()
 
@@ -30,25 +24,15 @@ func main() {
     }
 
     for _, url := range *urls {
-        urlChan<-url
-    }
+        response, err := external_api.Fetch[model.Monster](url)
 
-    close(urlChan)
+        if err != nil {
+            fmt.Printf("Cannot get the %v\n", url)
+            time.Sleep(3 * time.Millisecond)
+            continue
+        }
 
-    var wg sync.WaitGroup
-
-    for concurrency := 0; concurrency <= maxConcurrentRequest; concurrency++ {
-        wg.Add(1)
-        go external_api.Worker[model.Monster](urlChan, resultCh, &wg)
+        fmt.Println(response)
         time.Sleep(3 * time.Millisecond)
-    }
-
-    go func() {
-        wg.Wait()
-        close(resultCh)
-    }()
-
-    for msg := range resultCh {
-        fmt.Println(msg)
     }
 }
