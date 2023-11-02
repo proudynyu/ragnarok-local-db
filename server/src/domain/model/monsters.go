@@ -1,5 +1,12 @@
 package model
 
+type MonsterInterface interface {
+    Create(monster *Monster) error
+    Update(monster_id string) error
+    FindByName(monster_name string) (*Monster, error)
+    FindById(monster_id string) (*Monster, error)
+}
+
 type Monster struct  {
     id string 
     Monster_id int16 `json:"monster_id"`
@@ -9,8 +16,3 @@ type Monster struct  {
     Name string `json:"monster_info"`
     // Items []*Item
 }
-
-func (m *Monster) New(monster_id string, size string, race string, element_type string) error {
-    return nil
-}
-

@@ -2,15 +2,20 @@ version: "3"
 
 services:
   backend:
-    image: goland:1.20
+    context: ./server
     ports:
-      - 5555:5555
+      - "5555:5555"
     volumes: 
-      - ./server:/go/src
+      - ./server:/go/src/app
+    depends_on:
+      - database
+    environment:
+      DATABASE_URL: "file:/database/sqlite3.db"
 
   database:
-    image: nouchka/sqlite3:latest
+    restart: on-failure
+    container_name: sqlite3
     volumes:
       - ./database/:/database/
     ports:
-      - 7777:7777
+      - "7777:7777"
