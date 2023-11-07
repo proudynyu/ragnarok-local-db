@@ -10,14 +10,9 @@ Size of the project with database: --
 ## Techs
 
 - Golang (get api info)
-    - Gorm (ORM)
     - SQlite (database, local and lightweight)
 - Svelte (frontend Javascript Framework)
-
-**Maybe in the future**
-
-- Electron
-- GTK3
+- [Tarui](https://tauri.app/v1/guides/getting-started/setup/) Front End App
 
 ## Developers
 
