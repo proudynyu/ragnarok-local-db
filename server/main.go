@@ -3,13 +3,19 @@ package main
 import (
 	"fmt"
 	"log"
-	"time"
 
-	"server/src/domain/model"
+	// "server/src/infrastrutcture/database"
 	external_api "server/src/infrastrutcture/external-api"
+	"server/src/infrastrutcture/repositories"
 )
 
 func main() {
+    // dbConn, err := database.ConnectDb()
+    //
+    // if err != nil {
+    //     log.Fatal("Could not connect to the Database")
+    // }
+
 	base_url, err := external_api.NewApiUrl("https://ragnapi.com/api/v1/re-newal", "/monsters/", "/items/")
 
 	if err != nil {
@@ -23,16 +29,7 @@ func main() {
         log.Fatal(err)
     }
 
-    for _, url := range *urls {
-        response, err := external_api.Fetch[model.Monster](url)
+    var monsterRepo repositories.MonsterRepository
 
-        if err != nil {
-            fmt.Printf("Cannot get the %v\n", url)
-            time.Sleep(3 * time.Millisecond)
-            continue
-        }
-
-        fmt.Println(response)
-        time.Sleep(3 * time.Millisecond)
-    }
+    external_api.GetUrlsAndCreateRecord(urls, monsterRepo)
 }

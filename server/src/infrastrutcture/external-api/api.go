@@ -7,6 +7,8 @@ import (
 	"io"
 	"net/http"
 	"server/src/domain/model"
+	"server/src/infrastrutcture/repositories"
+	"time"
 )
 
 type ExternalApiUrl struct {
@@ -91,11 +93,11 @@ func JsonParse[K model.Monster | model.Item](body []byte) (string, error) {
     return string(formatted), nil
 }
 
-func Fetch[K model.Monster | model.Item](url string) (string, error) {
+func Fetch[K model.Monster | model.Item](url string) ([]byte, error) {
     resp, err := http.Get(url)
 
     if err != nil {
-        return "", err
+        return nil, err
     }
 
     defer resp.Body.Close()
@@ -105,14 +107,34 @@ func Fetch[K model.Monster | model.Item](url string) (string, error) {
     body, err := io.ReadAll(resp.Body)
 
     if err != nil {
-        return "", err
+        return nil, err
     }
 
-    formatted, err := JsonParse[K](body)
+    // formatted, err := JsonParse[K](body)
+    //
+    // if err != nil {
+    //     return "", err
+    // }
 
-    if err != nil {
-        return "", err
+    return body, nil
+}
+
+func GetUrlsAndCreateRecord(urls *[]string, repo repositories.MonsterRepository) {
+    for _, url := range *urls {
+        response, err := Fetch[model.Monster](url)
+
+        if err != nil {
+            fmt.Printf("Cannot get the %v\n", url)
+            time.Sleep(3 * time.Millisecond)
+            continue
+        }
+
+        err = repo.Create(response)
+
+        if err != nil {
+
+        }
+
+        time.Sleep(3 * time.Millisecond)
     }
-
-    return formatted, nil
 }

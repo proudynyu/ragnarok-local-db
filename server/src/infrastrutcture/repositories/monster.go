@@ -11,10 +11,10 @@ type MonsterRepository struct {
 	db *sql.DB
 }
 
-func (repo *MonsterRepository) Create(monster *model.Monster, api_response *[]byte) error {
+func (repo MonsterRepository) Create(api_response []byte) error {
 	var target model.Monster
 
-	err := json.Unmarshal(*api_response, &target)
+	err := json.Unmarshal(api_response, &target)
 
 	if err != nil {
 		return err
@@ -39,15 +39,14 @@ func (repo *MonsterRepository) Create(monster *model.Monster, api_response *[]by
 
 	return nil
 }
-
-func (repo *MonsterRepository) Update(monster_id string) error {
+func (repo MonsterRepository) Update(monster_id string) error {
 	return nil
 }
 
-func (repo *MonsterRepository) FindByName(monster_name string) error {
+func (repo MonsterRepository) FindByName(monster_name string) error {
 	return nil
 }
 
-func (repo *MonsterRepository) FindById(monster_id string) error {
+func (repo MonsterRepository) FindById(monster_id string) error {
 	return nil
 }
