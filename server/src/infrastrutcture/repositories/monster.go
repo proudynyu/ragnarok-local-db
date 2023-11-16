@@ -11,6 +11,10 @@ type MonsterRepository struct {
 	db *sql.DB
 }
 
+func NewMonsterRepo(db *sql.DB) *MonsterRepository {
+    return &MonsterRepository{db: db}
+}
+
 func (repo MonsterRepository) Create(api_response []byte) error {
 	var target model.Monster
 

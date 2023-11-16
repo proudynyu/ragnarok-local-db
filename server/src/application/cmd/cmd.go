@@ -8,7 +8,7 @@ import (
 	"server/src/infrastrutcture/repositories"
 )
 
-func Exec(*sql.DB) {
+func Exec(db *sql.DB) {
 	base_url, err := external_api.NewApiUrl("https://ragnapi.com/api/v1/re-newal", "/monsters/", "/items/")
 
 	if err != nil {
@@ -22,7 +22,7 @@ func Exec(*sql.DB) {
         log.Fatal(err)
     }
 
-    var monsterRepo repositories.MonsterRepository
+    monsterRepo := repositories.NewMonsterRepo(db)
 
     external_api.GetUrlsAndCreateRecord(urls, monsterRepo)
 }

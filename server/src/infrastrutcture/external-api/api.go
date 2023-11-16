@@ -110,16 +110,10 @@ func Fetch[K model.Monster | model.Item](url string) ([]byte, error) {
         return nil, err
     }
 
-    // formatted, err := JsonParse[K](body)
-    //
-    // if err != nil {
-    //     return "", err
-    // }
-
     return body, nil
 }
 
-func GetUrlsAndCreateRecord(urls *[]string, repo repositories.MonsterRepository) {
+func GetUrlsAndCreateRecord(urls *[]string, repo *repositories.MonsterRepository) {
     for _, url := range *urls {
         response, err := Fetch[model.Monster](url)
 
@@ -132,7 +126,7 @@ func GetUrlsAndCreateRecord(urls *[]string, repo repositories.MonsterRepository)
         err = repo.Create(response)
 
         if err != nil {
-
+            // add to the log
         }
 
         time.Sleep(3 * time.Millisecond)
