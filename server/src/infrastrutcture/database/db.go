@@ -9,7 +9,7 @@ import (
 )
 
 func ConnectDb() (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", "https://localhost:7777")
+	db, err := sql.Open("sqlite3", "http://localhost:7777")
 
 	if err != nil {
 		return nil, err

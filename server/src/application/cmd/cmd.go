@@ -1,13 +1,14 @@
 package cmd
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	external_api "server/src/infrastrutcture/external-api"
 	"server/src/infrastrutcture/repositories"
 )
 
-func Exec() {
+func Exec(*sql.DB) {
 	base_url, err := external_api.NewApiUrl("https://ragnapi.com/api/v1/re-newal", "/monsters/", "/items/")
 
 	if err != nil {

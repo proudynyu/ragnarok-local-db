@@ -8,6 +8,8 @@ services:
   #     - "5555:5555"
   #   depends_on:
   #     - database
+  # networks:
+  #   - local
  
   database:
     build:
@@ -16,3 +18,8 @@ services:
       - ./database:/usr/src/app
     ports:
       - "7777:7777"
+    networks:
+      - local
+
+networks:
+  local:

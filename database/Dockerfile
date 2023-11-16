@@ -1,7 +1,13 @@
 FROM alpine:latest
 
-WORKDIR /usr/src/app
+RUN apk --no-cache add sqlite
 
-COPY database.db /usr/src/app
+RUN mkdir /database
+
+WORKDIR /database
+
+COPY database.db /database
 
 EXPOSE 7777
+
+CMD ["sqlite3", "database.db"]

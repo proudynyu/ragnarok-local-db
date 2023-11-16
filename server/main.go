@@ -1,14 +1,17 @@
 package main
 
 import (
-    "server/src/application/cmd"
+	"log"
+	"server/src/application/cmd"
+	"server/src/infrastrutcture/database"
 )
 
 func main() {
-    cmd.Exec()
-    // dbConn, err := database.ConnectDb()
-    //
-    // if err != nil {
-    //     log.Fatal("Could not connect to the Database")
-    // }
+    dbConn, err := database.ConnectDb()
+
+    if err != nil {
+        log.Fatal("Could not connect to the Database")
+    }
+
+    cmd.Exec(dbConn)
 }
