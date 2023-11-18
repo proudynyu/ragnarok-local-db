@@ -43,6 +43,7 @@ func (repo MonsterRepository) Create(api_response []byte) error {
 
 	return nil
 }
+
 func (repo MonsterRepository) Update(monster_id string) error {
 	return nil
 }

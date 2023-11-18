@@ -5,6 +5,6 @@ import (
 	"server/src/infrastrutcture/handlers"
 )
 
-func routes() {
+func MonsterRouter() {
     http.HandleFunc("/monsters", handlers.MonsterHandler)
 }
