@@ -8,22 +8,28 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func ConnectDb() (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", "http://localhost:7777")
+var (
+    Db *sql.DB
+)
+
+func ConnectDb()  error {
+	database, err := sql.Open("sqlite3", "http://localhost:7777")
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	defer db.Close()
+	defer Db.Close()
 
-	err = db.Ping()
+	err = Db.Ping()
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return db, nil
+    Db = database
+
+	return nil
 }
 
 func CreateRecord(db *sql.DB, tableName string, data interface{}) error {

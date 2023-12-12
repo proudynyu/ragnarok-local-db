@@ -113,7 +113,9 @@ func Fetch[K model.Monster | model.Item](url string) ([]byte, error) {
     return body, nil
 }
 
-func GetUrlsAndCreateRecord(urls *[]string, repo *repositories.MonsterRepository) {
+func GetUrlsAndCreateRecord(urls *[]string) {
+    repo := repositories.MonsterRepo
+
     for _, url := range *urls {
         response, err := Fetch[model.Monster](url)
 

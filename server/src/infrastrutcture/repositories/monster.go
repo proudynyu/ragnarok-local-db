@@ -11,6 +11,10 @@ type MonsterRepository struct {
 	db *sql.DB
 }
 
+var (
+    MonsterRepo *MonsterRepository
+)
+
 func NewMonsterRepo(db *sql.DB) *MonsterRepository {
     return &MonsterRepository{db: db}
 }

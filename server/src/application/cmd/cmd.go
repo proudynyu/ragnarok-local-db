@@ -1,28 +1,27 @@
 package cmd
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
-	external_api "server/src/infrastrutcture/external-api"
-	"server/src/infrastrutcture/repositories"
+	"net/http"
+	"server/src/infrastrutcture/database"
+	"server/src/infrastrutcture/routes"
 )
 
-func Exec(db *sql.DB) {
-	base_url, err := external_api.NewApiUrl("https://ragnapi.com/api/v1/re-newal", "/monsters/", "/items/")
-
-	if err != nil {
-		log.Fatal("Not possible to create the base url")
-	}
-
-	fmt.Printf("init downloading files\n")
-    urls, err := base_url.CreateMonsterUrlRequest()
+func Exec() {
+    err := database.ConnectDb()
 
     if err != nil {
-        log.Fatal(err)
+        log.Fatal("Not possible to connect to the Database")
     }
 
-    monsterRepo := repositories.NewMonsterRepo(db)
+    r := routes.Router()
 
-    external_api.GetUrlsAndCreateRecord(urls, monsterRepo)
+    server := &http.Server{
+        Handler: r,
+        Addr: ":8080",
+    }
+
+    fmt.Printf("Server is listening on port 8080... \n")
+    log.Fatal(server.ListenAndServe(), "Failed to initialize the server")
 }
