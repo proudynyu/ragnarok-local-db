@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"server/src/infrastrutcture/database"
+	// "server/src/infrastrutcture/database"
 	"server/src/infrastrutcture/routes"
 )
 
 func Exec() {
-    err := database.ConnectDb()
-
-    if err != nil {
-        log.Fatal("Not possible to connect to the Database")
-    }
+    // err := database.ConnectDb()
+    //
+    // if err != nil {
+    //     log.Fatal("Not possible to connect to the Database")
+    // }
 
     r := routes.Router()
 

@@ -13,7 +13,7 @@ var (
 )
 
 func ConnectDb()  error {
-	database, err := sql.Open("sqlite3", "http://localhost:7777")
+	database, err := sql.Open("sqlite3", "./database.db")
 
 	if err != nil {
 		return err

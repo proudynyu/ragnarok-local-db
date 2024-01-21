@@ -1,13 +1,5 @@
-FROM alpine:latest
+FROM mysql:8.3.0
 
-RUN apk --no-cache add sqlite
+WORKDIR /usr/www/db
 
-RUN mkdir /database
-
-WORKDIR /database
-
-COPY database.db /database
-
-EXPOSE 7777
-
-CMD ["sqlite3", "database.db"]
+COPY . .

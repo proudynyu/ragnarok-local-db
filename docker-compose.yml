@@ -1,25 +1,23 @@
 version: "3"
 
 services:
-  # backend:
-  #   build:
-    #   context: ./server
-  #   ports:
-  #     - "5555:5555"
-  #   depends_on:
-  #     - database
-  # networks:
-  #   - local
- 
   database:
     build:
       context: ./database
     volumes:
-      - ./database:/usr/src/app
+      db: /usr/www/mysql
     ports:
       - "7777:7777"
+    environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: ragnarok_db
+        MYSQL_USER: ragnarok
+        MYSQL_PASSWORD: ragnarok
     networks:
       - local
+
+volumes:
+  db:
 
 networks:
   local:
